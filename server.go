@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"strings"
 )
 
 var PROTOCOL = "tcp"
@@ -57,15 +58,21 @@ func handleClient(client net.Conn, clientsList *[]string) {
 		fmt.Println(err)
 		return
 	} else {
-		clientID := string(data[:br])
+		clientID := strings.Split(string(data[:br]), "|")[0]
 		// check if client already exist
 		if clientIsInList(clientID, *clientsList) {
+			handleData(string(data[:br]))
 		} else {
 			fmt.Println(clientID + " connected...")
 			*clientsList = append(*clientsList, clientID)
 		}
 	}
 
+}
+
+func handleData(data string) {
+	// wait for client message
+	fmt.Println(data)
 }
 
 func main() {
