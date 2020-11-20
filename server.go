@@ -8,9 +8,6 @@ import (
 	Util "./util"
 )
 
-var PROTOCOL = "tcp"
-var PORT = ":9999"
-
 // Verifies if a client adress already exist on the list
 func clientIsInList(a string, list []string) bool {
 	for _, b := range list {
@@ -25,7 +22,7 @@ func clientIsInList(a string, list []string) bool {
 /// handling client petitions using the TCP connection
 /// on the 9999 port
 func server() {
-	server, err := net.Listen(PROTOCOL, PORT)
+	server, err := net.Listen(Util.PROTOCOL, Util.PORT)
 	var adressList []string
 
 	// terminate when an error ocurrs
