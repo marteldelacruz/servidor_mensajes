@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 	"strings"
+
+	Util "./util"
 )
 
 var PROTOCOL = "tcp"
@@ -71,8 +73,19 @@ func handleClient(client net.Conn, clientsList *[]string) {
 }
 
 func handleData(data string) {
-	// wait for client message
-	fmt.Println(data)
+	var dataContent = strings.Split(data, Util.Separator)
+
+	switch dataContent[1] {
+	case Util.File:
+		break
+	case Util.Message:
+		fmt.Println(dataContent[2])
+		break
+	case Util.Exit:
+		break
+	default:
+		break
+	}
 }
 
 func main() {

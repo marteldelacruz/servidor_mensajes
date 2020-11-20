@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net"
+
+	Util "./util"
 )
 
 var _PROTOCOL = "tcp"
@@ -32,7 +34,7 @@ func sendMessage(id string) {
 	}
 
 	// send client ID
-	conn.Write([]byte(id + "|message|Oh no"))
+	conn.Write([]byte(id + Util.Separator + Util.Message + Util.Separator + "Oh no"))
 }
 
 // The main menu contains all the available options
