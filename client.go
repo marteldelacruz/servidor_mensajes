@@ -23,9 +23,11 @@ func client(id string) {
 	conn.Write([]byte(id))
 }
 
-// Sends a message to the server.
-// The id represents the client name and m the message
-func sendMessage(id string, m string) {
+// Sends a data type to the server.
+// The data can be a message or a exit signal
+// The id represents the client name, d_type the data type
+// to be sent and m the message
+func sendData(id string, d_type string, m string) {
 	conn, err := net.Dial(Util.PROTOCOL, Util.PORT)
 
 	if err != nil {
@@ -34,7 +36,7 @@ func sendMessage(id string, m string) {
 	}
 
 	// send client ID and message with separator
-	conn.Write([]byte(id + Util.Separator + Util.Message + Util.Separator + m))
+	conn.Write([]byte(id + Util.Separator + d_type + Util.Separator + m))
 }
 
 // The main menu contains all the available options
@@ -59,13 +61,14 @@ func mainMenu(id string) {
 			fmt.Print("Type message: ")
 			scanner.Scan()
 			msg = scanner.Text()
-			sendMessage(id, msg)
+			sendData(id, Util.Message, msg)
 			break
 		case "2":
 			break
 		case "3":
 			break
 		case "0":
+			sendData(id, Util.Exit, "")
 			return
 			break
 		default:
