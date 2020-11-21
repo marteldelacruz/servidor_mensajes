@@ -43,24 +43,29 @@ func sendDataToClient(id string, clientList []Util.Client, msgList *[]string) {
 
 	// client exist
 	if i != Util.Invalid {
-		fmt.Println(id + " exist on list")
 		for {
 			// client is out
 			if clientList[i].Exit {
 				break
 			}
 			if newMessage {
-				fmt.Println("Msg sent to : " + id)
-				clientList[i].Conn.Write([]byte(Util.ListToString(*msgList)))
+				clientList[i].Conn.Write([]byte(Util.Messages + Util.Separator + Util.ListToString(*msgList)))
 			}
 			time.Sleep(time.Millisecond * 500)
 		}
 	}
 }
 
+// sends a file to all the clients
+func sendFileToClients(clientList []Util.Client, name string, content string) {
+	for _, client := range clientList {
+		client.Conn.Write([]byte(Util.File + Util.Separator + name + Util.Separator + content))
+	}
+}
+
 // Saves a new client on the client list
 func saveNewClient(id string, clientList *[]Util.Client) {
-	fmt.Println(id + " connected...")
+	fmt.Println(id + " CONNECTED...")
 	newClient := Util.Client{
 		Name: id,
 		Conn: nil,
@@ -95,7 +100,7 @@ func handleClient(client net.Conn, clientList *[]Util.Client, msgList *[]string)
 		fmt.Println(err)
 		return
 	} else {
-		dataSlice := strings.Split(string(data[:br]), "|")
+		dataSlice := strings.Split(string(data[:br]), Util.Separator)
 
 		// check if is client already exist
 		if Util.IsInList(dataSlice[0], *clientList) {
@@ -113,21 +118,21 @@ func handleData(client net.Conn, clientList *[]Util.Client, data string, msgList
 
 	switch dataContent[1] {
 	case Util.Ask: // Ask for data
-		fmt.Println(dataContent[0] + " ask for data")
+		fmt.Println(dataContent[0] + " ASK FOR DATA")
 		updateClient(dataContent[0], client, clientList, msgList)
 		break
 	case Util.Exit: // Exit from the server
-		fmt.Println(dataContent[0] + " disconnected...")
+		fmt.Println(dataContent[0] + " DISCONNECTED")
 		// TODO
 		break
 	case Util.File: // Receive a file
-		fmt.Println(dataContent[0] + " sent a file...")
-		fmt.Println("bytes => " + dataContent[2])
+		fmt.Println(dataContent[0] + " SENT A FILE")
+		sendFileToClients(*clientList, dataContent[2], dataContent[3])
 		break
 	case Util.Message: // Receive a message
+		fmt.Println(dataContent[0] + " SENT A MESSAGE")
 		newMessage = true
 		*msgList = append(*msgList, dataContent[0]+Util.Space+dataContent[2])
-		fmt.Println(dataContent[0] + Util.Space + dataContent[2])
 		time.Sleep(time.Millisecond * 500)
 		newMessage = false
 		break

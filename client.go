@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path/filepath"
+	"strings"
 
 	Util "./util"
 )
@@ -31,8 +33,10 @@ func client(id string) {
 // This is a go routine that will manage all incomming
 // data from the server
 func receiveData(id string) {
+	scanner := bufio.NewScanner(os.Stdin)
 	data := make([]byte, Util.Max_File_Size)
 	conn, err := net.Dial(Util.PROTOCOL, Util.PORT)
+	var opt string
 
 	if err != nil {
 		fmt.Println(err)
@@ -51,8 +55,19 @@ func receiveData(id string) {
 			continue
 		}
 
+		dataSlice := strings.Split(string(data[:br]), Util.Separator)
+
 		if showMessage {
-			fmt.Println(string(data[:br]))
+			switch dataSlice[0] {
+			// print message
+			case Util.Messages:
+				fmt.Println(dataSlice[1])
+				break
+			// save file
+			case Util.File:
+				Util.SaveFile(dataSlice[1], dataSlice[2])
+				break
+			}
 		}
 	}
 }
@@ -82,7 +97,7 @@ func sendFile(id string) {
 	scanner.Scan()
 	path = scanner.Text()
 	bytes := Util.GetFile(path)
-	sendData(id, Util.File, bytes)
+	sendData(id, Util.File+Util.Separator+filepath.Base(path), bytes)
 }
 
 // The main menu contains all the available options

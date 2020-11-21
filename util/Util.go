@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net"
+	"os/user"
 )
 
 const (
@@ -66,6 +67,19 @@ func Remove(s []string, r string) []string {
 		}
 	}
 	return s
+}
+
+// Saves a new file with the given name and content
+func SaveFile(name string, content string) {
+	myself, error := user.Current()
+
+	if error != nil {
+		fmt.Println(error)
+	}
+
+	fullPath := myself.HomeDir + "/Documents/" + name
+	fmt.Println("FILE SAVED AT => " + fullPath)
+	ioutil.WriteFile(fullPath, []byte(content), 0)
 }
 
 // Returns a string with the bytes of the file
