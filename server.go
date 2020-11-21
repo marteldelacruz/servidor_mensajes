@@ -1,15 +1,18 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"net"
+	"os"
 	"strings"
 	"time"
 
 	Util "./util"
 )
 
-var newMessage bool
+var newMessage, printLogs bool
+var _receiveData string
 
 /// This rutine runs the server on a loop to keep
 /// handling client petitions using the TCP connection
@@ -65,7 +68,9 @@ func sendFileToClients(clientList []Util.Client, name string, content string) {
 
 // Saves a new client on the client list
 func saveNewClient(id string, clientList *[]Util.Client) {
-	fmt.Println(id + " CONNECTED...")
+	if printLogs {
+		fmt.Println(id + " CONNECTED...")
+	}
 	newClient := Util.Client{
 		Name: id,
 		Conn: nil,
@@ -125,23 +130,25 @@ func handleClient(client net.Conn, clientList *[]Util.Client, msgList *[]string)
 // The data such as: message, files and exit
 func handleData(client net.Conn, clientList *[]Util.Client, data string, msgList *[]string) {
 	var dataContent = strings.Split(data, Util.Separator)
+	var msg string
 	id := dataContent[0]
 
 	switch dataContent[1] {
 	case Util.Ask: // Ask for data
-		fmt.Println(id + " ASK FOR DATA")
+		msg = id + " ASK FOR DATA"
 		updateClient(id, client, clientList, msgList)
 		break
 	case Util.Exit: // Exit from the server
-		fmt.Println(id + " DISCONNECTED")
+		msg = id + " DISCONNECTED"
 		removeClient(id, clientList)
 		break
 	case Util.File: // Receive a file
-		fmt.Println(id + " SENT A FILE")
+		msg = id + Util.Space + dataContent[2]
+		*msgList = append(*msgList, msg)
 		sendFileToClients(*clientList, dataContent[2], dataContent[3])
 		break
 	case Util.Message: // Receive a message
-		fmt.Println(id + " SENT A MESSAGE")
+		msg = id + " => " + dataContent[2]
 		newMessage = true
 		*msgList = append(*msgList, id+Util.Space+dataContent[2])
 		time.Sleep(time.Millisecond * 500)
@@ -150,11 +157,53 @@ func handleData(client net.Conn, clientList *[]Util.Client, data string, msgList
 	default:
 		break
 	}
+
+	// print logs
+	if printLogs {
+		_receiveData = Util.ListToString(*msgList)
+		fmt.Println(msg)
+	}
+}
+
+// The main menu contains all the available options
+// for the server
+func menu() {
+	var opt string
+	scanner := bufio.NewScanner(os.Stdin)
+	printLogs = false
+	_receiveData = ""
+
+	for {
+		fmt.Print("\n\n")
+		fmt.Println("1-. Show received data")
+		fmt.Println("2.- Export data")
+		fmt.Println("0.- Exit")
+
+		fmt.Print("Select an option: ")
+		scanner.Scan()
+		opt = scanner.Text()
+
+		switch opt {
+		case "1":
+			printLogs = true
+			scanner.Scan()
+			scanner.Text()
+			printLogs = false
+			break
+		case "2":
+			fmt.Println(_receiveData)
+			Util.SaveFile("data.txt", _receiveData)
+			break
+		case "0":
+			return
+			break
+		default:
+		}
+	}
 }
 
 func main() {
 	go server()
 
-	// press enter to exit...
-	fmt.Scanln()
+	menu()
 }

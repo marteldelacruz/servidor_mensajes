@@ -72,9 +72,9 @@ func SaveFile(name string, content string) {
 		fmt.Println(error)
 	}
 
-	fullPath := myself.HomeDir + "/Documents/" + name
+	fullPath := myself.HomeDir + "/Documents/Server/" + name
 	fmt.Println("FILE SAVED AT => " + fullPath)
-	ioutil.WriteFile(fullPath, []byte(content), 0)
+	ioutil.WriteFile(fullPath, []byte(content), 0644)
 }
 
 // Returns a string with the bytes of the file
