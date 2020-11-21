@@ -33,10 +33,8 @@ func client(id string) {
 // This is a go routine that will manage all incomming
 // data from the server
 func receiveData(id string) {
-	scanner := bufio.NewScanner(os.Stdin)
 	data := make([]byte, Util.Max_File_Size)
 	conn, err := net.Dial(Util.PROTOCOL, Util.PORT)
-	var opt string
 
 	if err != nil {
 		fmt.Println(err)

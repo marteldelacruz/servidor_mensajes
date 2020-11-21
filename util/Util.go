@@ -60,13 +60,8 @@ func IsInList(a string, list []Client) bool {
 }
 
 // Removes an element from the string list
-func Remove(s []string, r string) []string {
-	for i, v := range s {
-		if v == r {
-			return append(s[:i], s[i+1:]...)
-		}
-	}
-	return s
+func RemoveIndex(s []Client, index int) []Client {
+	return append(s[:index], s[index+1:]...)
 }
 
 // Saves a new file with the given name and content

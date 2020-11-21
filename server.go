@@ -87,6 +87,16 @@ func updateClient(id string, client net.Conn, clientList *[]Util.Client, msgList
 	go sendDataToClient(id, *clientList, msgList)
 }
 
+// Removes a client from the client list using the id as reference
+func removeClient(id string, clientList *[]Util.Client) {
+	i := Util.GetClientIndex(id, *clientList)
+
+	// client exist
+	if i != Util.Invalid {
+		*clientList = Util.RemoveIndex(*clientList, i)
+	}
+}
+
 // This function takes charge of handling clients
 // by sending them a process the first time they
 // connect to the server
@@ -115,24 +125,25 @@ func handleClient(client net.Conn, clientList *[]Util.Client, msgList *[]string)
 // The data such as: message, files and exit
 func handleData(client net.Conn, clientList *[]Util.Client, data string, msgList *[]string) {
 	var dataContent = strings.Split(data, Util.Separator)
+	id := dataContent[0]
 
 	switch dataContent[1] {
 	case Util.Ask: // Ask for data
-		fmt.Println(dataContent[0] + " ASK FOR DATA")
-		updateClient(dataContent[0], client, clientList, msgList)
+		fmt.Println(id + " ASK FOR DATA")
+		updateClient(id, client, clientList, msgList)
 		break
 	case Util.Exit: // Exit from the server
-		fmt.Println(dataContent[0] + " DISCONNECTED")
-		// TODO
+		fmt.Println(id + " DISCONNECTED")
+		removeClient(id, clientList)
 		break
 	case Util.File: // Receive a file
-		fmt.Println(dataContent[0] + " SENT A FILE")
+		fmt.Println(id + " SENT A FILE")
 		sendFileToClients(*clientList, dataContent[2], dataContent[3])
 		break
 	case Util.Message: // Receive a message
-		fmt.Println(dataContent[0] + " SENT A MESSAGE")
+		fmt.Println(id + " SENT A MESSAGE")
 		newMessage = true
-		*msgList = append(*msgList, dataContent[0]+Util.Space+dataContent[2])
+		*msgList = append(*msgList, id+Util.Space+dataContent[2])
 		time.Sleep(time.Millisecond * 500)
 		newMessage = false
 		break
