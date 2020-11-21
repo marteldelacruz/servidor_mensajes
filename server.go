@@ -175,7 +175,7 @@ func menu() {
 
 	for {
 		fmt.Print("\n\n")
-		fmt.Println("1-. Show received data")
+		fmt.Println("1-. Show incoming data")
 		fmt.Println("2.- Export data")
 		fmt.Println("0.- Exit")
 

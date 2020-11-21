@@ -12,7 +12,7 @@ const (
 	Exit          = "4"
 	File          = "2"
 	Invalid       = -1
-	Max_File_Size = 1000
+	Max_File_Size = 100000
 	Message       = "1"
 	Messages      = "3"
 	PROTOCOL      = "tcp"
