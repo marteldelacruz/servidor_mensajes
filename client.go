@@ -9,6 +9,9 @@ import (
 	Util "./util"
 )
 
+var showMessage = false
+var endQueue = false
+
 // The new client will connect to a server on the PORT
 // if the server is not running already, an error message
 // will be shown
@@ -21,6 +24,35 @@ func client(id string) {
 	}
 	// send client ID
 	conn.Write([]byte(id))
+
+	go receiveData(id)
+}
+
+// This is a go routine that will manage all incomming
+// data from the server
+func receiveData(id string) {
+	data := make([]byte, Util.Max_File_Size)
+	conn, err := net.Dial(Util.PROTOCOL, Util.PORT)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// send client ID
+	conn.Write([]byte(id + Util.Separator + Util.Ask))
+
+	// loop to handle server messages
+	for {
+		br, err := conn.Read(data)
+
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		fmt.Println(string(data[:br]))
+	}
 }
 
 // Sends a data type to the server.
@@ -37,6 +69,18 @@ func sendData(id string, d_type string, m string) {
 
 	// send client ID and message with separator
 	conn.Write([]byte(id + Util.Separator + d_type + Util.Separator + m))
+}
+
+// Sends a file to the server
+func sendFile(id string) {
+	var path string
+	scanner := bufio.NewScanner(os.Stdin)
+
+	fmt.Print("File path: ")
+	scanner.Scan()
+	path = scanner.Text()
+	bytes := Util.GetFile(path)
+	sendData(id, Util.File, bytes)
 }
 
 // The main menu contains all the available options
@@ -64,6 +108,7 @@ func mainMenu(id string) {
 			sendData(id, Util.Message, msg)
 			break
 		case "2":
+			sendFile(id)
 			break
 		case "3":
 			break
