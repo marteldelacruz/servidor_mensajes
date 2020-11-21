@@ -28,13 +28,13 @@ type Client struct {
 
 // Returns the given string list as a single string
 func ListToString(list []string) string {
-	s := ""
+	s := "\n---------------------------------------\n"
 
 	for _, b := range list {
 		s += b + "\n"
 	}
 
-	return s
+	return s + "---------------------------------------"
 }
 
 // Verifies if a string already exist on the list

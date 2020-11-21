@@ -51,7 +51,9 @@ func receiveData(id string) {
 			continue
 		}
 
-		fmt.Println(string(data[:br]))
+		if showMessage {
+			fmt.Println(string(data[:br]))
+		}
 	}
 }
 
@@ -111,6 +113,10 @@ func mainMenu(id string) {
 			sendFile(id)
 			break
 		case "3":
+			showMessage = true
+			scanner.Scan()
+			scanner.Text()
+			showMessage = false
 			break
 		case "0":
 			sendData(id, Util.Exit, "")

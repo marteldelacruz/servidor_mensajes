@@ -69,7 +69,7 @@ func saveNewClient(id string, clientList *[]Util.Client) {
 	*clientList = append(*clientList, newClient)
 }
 
-//
+// Updates the client connection obj on the list
 func updateClient(id string, client net.Conn, clientList *[]Util.Client, msgList *[]string) {
 	i := Util.GetClientIndex(id, *clientList)
 
@@ -118,7 +118,7 @@ func handleData(client net.Conn, clientList *[]Util.Client, data string, msgList
 		break
 	case Util.Exit: // Exit from the server
 		fmt.Println(dataContent[0] + " disconnected...")
-		*msgList = Util.Remove(*msgList, dataContent[0])
+		// TODO
 		break
 	case Util.File: // Receive a file
 		fmt.Println(dataContent[0] + " sent a file...")
